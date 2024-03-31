@@ -1,0 +1,43 @@
+services:
+  planefence:
+    image: ghcr.io/sdr-enthusiasts/docker-planefence:dev
+    tty: true
+    container_name: planefence
+    # host and your internal network:
+    networks:
+    - t2_proxy
+    security_opt:
+    - no-new-privileges:true
+    restart: always
+    # we are phasing out the .env file in favor of a similar file named
+    # ~/.planefence/planefence.config. A template of that file will be
+    # generated automatically when you start the container for the first
+    # time. Planefence will not work unless you have either a .env file or
+    # a planefence.config file. Any values defined in planefence.config
+    # will take priority over those in .env. Uncomment the line below if you
+    # really want to continue to use your pre-existing .env file.
+    # Also, update TZ=America/New_York to your own timezone.
+    #
+    # LOGLEVEL can be "INFO" (default - all logs) or "ERROR" (only errors)
+    environment:
+      - TZ=$TZ
+      - LOGLEVEL=INFO
+    volumes:
+      # adopt this one to point at your home directory if it is not /home/pi
+      - $DOCKERDIR/adsb/planefence/persist:/usr/share/planefence/persist
+      # the following exposes the html directory to the host, in case you
+      # want to use an external http daemon (lighttpd, nginx, etc)
+      - $DOCKERDIR/adsb/planefence/html:/usr/share/planefence/html
+    tmpfs:
+      - /run:rw,nosuid,nodev,exec,relatime,size=512M
+      - /tmp:rw,nosuid,nodev,noexec,relatime,size=128M
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.planefence-rtr.entrypoints=websecure"
+      - "traefik.http.routers.planefence-rtr.rule=Host(`planefence.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.planefence-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.planefence-rtr.service=planefence-svc"
+      - "traefik.http.services.planefence-svc.loadbalancer.server.port=80"

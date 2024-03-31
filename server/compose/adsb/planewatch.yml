@@ -1,0 +1,20 @@
+services:
+  planewatch:
+    image: ghcr.io/plane-watch/docker-plane-watch:latest
+    tty: true
+    container_name: planewatch
+    networks:
+    - t2_proxy
+    security_opt:
+    - no-new-privileges:true
+    restart: always
+    environment:
+      - BEASTHOST=beast.${DOMAINLOCAL}
+      - LAT=${FEEDER_LAT}
+      - LONG=${FEEDER_LONG}
+      - ALT=${FEEDER_ALT_M}m
+      - TZ=${TZ}
+      - API_KEY=${PW_API_KEY}
+    tmpfs:
+      - /run:exec,size=64M
+      - /var/log

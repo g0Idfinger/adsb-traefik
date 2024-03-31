@@ -1,0 +1,5 @@
+http:
+  middlewares:
+    middlewares-vrs-add-virtualradar:
+      addPrefix:
+        prefix: /VirtualRadar

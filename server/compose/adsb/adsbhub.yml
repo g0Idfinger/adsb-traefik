@@ -1,0 +1,14 @@
+services:
+  adsbhub:
+    image: ghcr.io/sdr-enthusiasts/docker-adsbhub:latest
+    tty: true
+    container_name: adsbhub
+    networks:
+    - t2_proxy
+    security_opt:
+    - no-new-privileges:true
+    restart: always
+    environment:
+      - TZ=${TZ}
+      - SBSHOST=beast.${DOMAINLOCAL}
+      - CLIENTKEY=${ADSBHUB_STATION_KEY}

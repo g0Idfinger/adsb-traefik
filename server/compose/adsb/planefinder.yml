@@ -1,0 +1,30 @@
+services:
+  pfclient:
+    image: ghcr.io/sdr-enthusiasts/docker-planefinder:latest
+    tty: true
+    container_name: pfclient
+    networks:
+    - t2_proxy
+    security_opt:
+    - no-new-privileges:true
+    restart: always
+    environment:
+      - TZ=${TZ}
+      - BEASTHOST=beast.${DOMAINLOCAL}
+      - LAT=${FEEDER_LAT}
+      - LONG=${FEEDER_LONG}
+      - SHARECODE=${PLANEFINDER_SHARECODE}
+    tmpfs:
+      - /run:exec,size=64M
+      - /var/log/pfclienot
+    labels:
+      #- "autoheal=true"
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.pf-rtr.entrypoints=websecure"
+      - "traefik.http.routers.pf-rtr.rule=Host(`pf.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.pf-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.pf-rtr.service=pf-svc"
+      - "traefik.http.services.pf-svc.loadbalancer.server.port=30053"

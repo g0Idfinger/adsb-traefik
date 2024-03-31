@@ -1,0 +1,16 @@
+http:
+  routers:
+    readsb-rtr:
+      rule: "Host(`readsb.gldfngr.net`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth
+      service: readsb-svc
+      tls:
+        certResolver: dns-cloudflare
+  services:
+    readsb-svc:
+      loadBalancer:
+        servers:
+         - url: "http://10.100.255.218:8080"  # or whatever your external host's IP:port is

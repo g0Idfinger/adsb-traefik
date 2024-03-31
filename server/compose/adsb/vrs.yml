@@ -1,0 +1,36 @@
+services:
+  vrs:
+    image: ghcr.io/sdr-enthusiasts/vrs:dev
+    tty: true
+    container_name: vrs
+    networks:
+    - t2_proxy
+    security_opt:
+    - no-new-privileges:true
+    restart: always
+    environment:
+      - VRS_ADMIN_USERNAME=${VRS_USER}
+      - VRS_ADMIN_PASSWORD=${VRS_PASSWORD}
+      - VRS_CULTURE=en-US
+      - VRS_DB_UPDATE_POLICY_FULLAUTO=yes
+      - VRS_ENHANCED_LAYERS_COUNTRY=USAAZ
+      - VRS_ENHANCED_MARKERS=normal
+      - VRS_ENHANCED_LAYERS_OPENWX_APIKEY=${VRS_OPENWX_APIKEY}
+      - VRS_ENHANCED_LAYERS_OPENAIP_APIKEY=${VRS_OPENAIP_APIKEY}
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,noexec,relatime,size=128M
+    ports:
+      - 8181:8080
+    volumes:
+      - "$DOCKERDIR/adsb/vrs:/root/.local/share/VirtualRadar"
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      #- "traefik.http.routers.vrs-rtr.tls=true"
+      - "traefik.http.routers.vrs-rtr.entrypoints=websecure"
+      - "traefik.http.routers.vrs-rtr.rule=Host(`vrs.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.vrs-rtr.middlewares=chain-vrs-no-auth@file"  
+      ## HTTP Services
+      - "traefik.http.routers.vrs-rtr.service=vrs-svc"
+      - "traefik.http.services.vrs-svc.loadbalancer.server.port=8080"

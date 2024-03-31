@@ -1,0 +1,15 @@
+services:
+   piaware-exporter:
+    container_name: piaware_exporter
+    image: piaware_exporter:2.0
+    networks:
+    - t2_proxy
+    security_opt:
+    - no-new-privileges:true
+    restart: always
+    #ports:
+        #- 9101:9101
+    command: [
+      "--piaware_host",
+      "piaware"
+    ]

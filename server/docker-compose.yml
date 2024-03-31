@@ -1,0 +1,54 @@
+########################### NETWORKS
+networks:
+  default:
+    driver: bridge
+  t2_proxy:
+    name: t2_proxy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.90.0/24
+  zsocket_proxy:
+    name: zsocket_proxy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.91.0/24
+
+########################### SECRETS
+secrets:
+  basic_auth_credentials:
+    file: $DOCKERDIR/secrets/basic_auth_credentials
+  cf_dns_api_token:
+    file: $DOCKERDIR/secrets/cf_dns_api_token
+  
+include:
+  ########################### SERVICES
+  
+  # HOSTNAME=silkyserver - defined in .env
+  
+ ### CORE
+  - compose/$HOSTNAME/socket-proxy.yml
+  - compose/$HOSTNAME/traefik.yml
+  - compose/$HOSTNAME/dozzle.yml
+  - compose/$HOSTNAME/cf-ddns.yml
+ ### MONITORING
+  - compose/$HOSTNAME/grafana.yml
+  - compose/$HOSTNAME/prometheus.yml
+  - compose/$HOSTNAME/influxdb.yml
+  - compose/$HOSTNAME/node-exporter.yml
+ ### MAINTENANCE
+  - compose/$HOSTNAME/docker-gc.yml
+  - compose/$HOSTNAME/watchtower.yml
+ ### ADSB
+  - compose/adsb/fr24.yml
+  - compose/adsb/piaware.yml
+  - compose/adsb/adsbhub.yml
+  - compose/adsb/radarbox.yml
+  - compose/adsb/radarvirtuel.yml
+  - compose/adsb/opensky.yml
+  - compose/adsb/planefinder.yml
+  - compose/adsb/planewatch.yml
+  - compose/adsb/vrs.yml
+  - compose/adsb/screenshot.yml
+  - compose/adsb/planefence.yml

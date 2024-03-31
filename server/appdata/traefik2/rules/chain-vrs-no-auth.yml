@@ -1,0 +1,11 @@
+http:
+  middlewares:
+    chain-vrs-no-auth:
+      chain:
+        middlewares:
+          - middlewares-traefik-bouncer
+          - middlewares-rate-limit
+          - middlewares-https-redirectscheme
+          - middlewares-vrs-headers
+          - middlewares-compress
+          #- middlewares-vrs-add-virtualradar

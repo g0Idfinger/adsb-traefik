@@ -1,0 +1,27 @@
+services:
+  radarvirtuel:
+    image: ghcr.io/sdr-enthusiasts/docker-radarvirtuel:latest
+    tty: true
+    container_name: radarvirtuel
+    networks:
+    - t2_proxy
+    security_opt:
+    - no-new-privileges:true
+    restart: always
+    ports:
+      - 44443:30105
+    environment:
+      - FEEDER_KEY=${RV_FEEDER_KEY}
+      - SOURCE_HOST=beast.${DOMAINLOCAL}:30002
+      - RV_SERVER=mg22.adsbnetwork.com:50050
+      - VERBOSE=OFF
+      - MLAT_SERVER=mlat.adsbnetwork.com:50000
+      - MLAT_HOST=beast.${DOMAINLOCAL}:30005
+      - LAT=${FEEDER_LAT}
+      - LON=${FEEDER_LONG}
+      - ALT=${FEEDER_ALT_M}
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,noexec,relatime,size=128M
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"

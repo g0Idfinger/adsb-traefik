@@ -1,0 +1,44 @@
+services:
+  piaware:
+    image: ghcr.io/sdr-enthusiasts/docker-piaware:latest
+    tty: true
+    container_name: piaware
+    networks:
+    - t2_proxy
+    security_opt:
+    - no-new-privileges:true
+    restart: always
+    ports:
+      - 44441:30105
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - BEASTHOST=beast.${DOMAINLOCAL}
+      - RECEIVER_TYPE=relay
+      - VERBOSE_LOGGING=true
+      - LAT=${FEEDER_LAT}
+      - LONG=${FEEDER_LONG}
+      - TZ=${TZ}
+      - FEEDER_ID=${PIAWARE_FEEDER_ID}
+      - UAT_RECEIVER_TYPE=relay
+      - UAT_RECEIVER_HOST=beast.${DOMAINLOCAL}
+      - UAT_RECEIVER_PORT=30978
+      - MLAT_RESULTS_BEASTHOST=mlat.${DOMAINLOCAL}
+    healthcheck:
+      disable: true
+    volumes:
+      - $DOCKERDIR/adsb/piaware/piaware.conf:/etc/piaware.conf
+    tmpfs:
+      - /run:exec,size=64M
+      - /var/log
+    labels:
+      #- "autoheal=true"
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.sa-rtr.entrypoints=websecure"
+      - "traefik.http.routers.sa-rtr.rule=Host(`sa.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.sa-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.sa-rtr.service=sa-svc"
+      - "traefik.http.services.sa-svc.loadbalancer.server.port=8080"

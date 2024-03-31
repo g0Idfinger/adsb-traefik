@@ -1,0 +1,15 @@
+services:
+  watchtower:
+    container_name: watchtower
+    image: containrrr/watchtower
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - TZ=$TZ
+      - WATCHTOWER_CLEANUP=true                                        
+      - WATCHTOWER_INCLUDE_RESTARTING=true
+      - WATCHTOWER_POLL_INTERVAL=36000    
+      # - DOCKER_HOST=tcp://10.100.255.218:2375              
+      #- WATCHTOWER_SCHEDULE=0 0 9 * * *
+      #- WATCHTOWER_DEBUG=true

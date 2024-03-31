@@ -1,0 +1,33 @@
+services:
+  fr24:
+    image: ghcr.io/sdr-enthusiasts/docker-flightradar24:latest
+    tty: true
+    container_name: fr24
+    networks:
+    - t2_proxy
+    security_opt:
+    - no-new-privileges:true
+    restart: always
+    environment:
+      - BEASTHOST=beast.${DOMAINLOCAL}
+      - TZ=${TZ}
+      - FR24KEY=${FR24_SHARING_KEY}
+      - FR24KEY_UAT=${FR24_UAT_KEY}
+      - UATHOST=beast.${DOMAINLOCAL}
+      - UATPORT=30978
+      - MLAT=yes
+    healthcheck:
+      disable: true
+    tmpfs:
+      - /var/log
+    labels:
+      #- "autoheal=true"
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.fr-rtr.entrypoints=websecure"
+      - "traefik.http.routers.fr-rtr.rule=Host(`fr.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.fr-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.fr-rtr.service=fr-svc"
+      - "traefik.http.services.fr-svc.loadbalancer.server.port=8754"

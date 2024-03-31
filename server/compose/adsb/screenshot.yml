@@ -1,0 +1,18 @@
+services:
+  screenshot:
+    image: tedder42/browser-screenshot-service:latest
+    tty: true
+    container_name: screenshot
+    networks:
+    - t2_proxy
+    security_opt:
+    - no-new-privileges:true
+    restart: always
+    shm_size: 1gb
+    environment:
+      - MAP_ARGS=zoom=11.5&hideSidebar&hideButtons&mapDim=0.2&monochromeMarkers=ff0000&outlineColor=505050&iconScale=1.5&enableLabels&extendedLabels=2&trackLabels
+     # - MAP_ARGS=zoom=11&hideSidebar&hideButtons&mapDim=2.0&monochromeMarkers=ff0000&outlineColor=505050&iconScale=1.5
+     #- MAP_ARGS=zoom=11&hideSidebar&hideButtons&mapDim=0.4&monochromeMarkers=00066&monochromeTracks=010101&outlineColor=505050&iconScale=1.5
+      - LOAD_SLEEP_TIME=25
+      - BASE_URL=http://beast.$DOMAINLOCAL:8080
+      - MAXTIME=60

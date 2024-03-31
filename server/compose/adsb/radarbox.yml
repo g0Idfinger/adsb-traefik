@@ -1,0 +1,25 @@
+services:
+  rbfeeder:
+    image: ghcr.io/sdr-enthusiasts/docker-radarbox:latest
+    tty: true
+    container_name: rbfeeder
+    networks:
+    - t2_proxy
+    security_opt:
+    - no-new-privileges:true
+    restart: always
+    ports:
+      - 44442:30105
+    environment:
+      - BEASTHOST=beast.${DOMAINLOCAL}
+      - LAT=${FEEDER_LAT}
+      - LONG=${FEEDER_LONG}
+      - ALT=${FEEDER_ALT_M}
+      - TZ=${TZ}
+      - SHARING_KEY=${RADARBOX_SHARING_KEY}
+      - UAT_RECEIVER_HOST=beast.${DOMAINLOCAL}
+    volumes:
+      - "$DOCKERDIR/adsb/rbfeeder/fake_cpuinfo:/proc/cpuinfo"
+    tmpfs:
+      - /run:exec,size=64M
+      - /var/log

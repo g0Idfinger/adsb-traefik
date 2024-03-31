@@ -1,0 +1,31 @@
+services:
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    networks:
+    - t2_proxy
+    security_opt:
+    - no-new-privileges:true
+    restart: always
+    ports:
+      - "3000:3000"
+    user: ${PUID}:${PGID}
+    volumes:
+      - $DOCKERDIR/appdata/grafana:/var/lib/grafana
+      - $DOCKERDIR/appdata/grafana/provisioning/:/etc/grafana/provisioning/
+      - $DOCKERDIR/appdata/grafana/dashboards/:/var/lib/grafana/dashboards/
+      - $DOCKERDIR/appdata/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - $DOCKERDIR/appdata/vrs/root:/var/lib/vrsdb/:ro
+    environment:
+      GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource,grafana-worldmap-panel,grafana-piechart-panel"
+      GF_PANELS_DISABLE_SANITIZE_HTML: true
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.grafana-rtr.entrypoints=websecure"
+      - "traefik.http.routers.grafana-rtr.rule=Host(`grafana.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.grafana-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.grafana-rtr.service=grafana-svc"
+      - "traefik.http.services.grafana-svc.loadbalancer.server.port=3000"

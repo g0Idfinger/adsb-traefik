@@ -1,0 +1,21 @@
+services:
+  opensky:
+    image: ghcr.io/sdr-enthusiasts/docker-opensky-network:latest
+    tty: true
+    container_name: opensky
+    networks:
+    - t2_proxy
+    security_opt:
+    - no-new-privileges:true
+    restart: always
+    environment:
+      - TZ=${TZ}
+      - BEASTHOST=beast.${DOMAINLOCAL}
+      - LAT=${FEEDER_LAT}
+      - LONG=${FEEDER_LONG}
+      - ALT=${FEEDER_ALT_M}
+      - OPENSKY_USERNAME=${OPENSKY_USERNAME}
+      - OPENSKY_SERIAL=${OPENSKY_SERIAL}
+    tmpfs:
+      - /run:exec,size=64M
+      - /var/log

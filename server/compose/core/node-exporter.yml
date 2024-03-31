@@ -1,0 +1,17 @@
+services:
+  node-exporter:
+    container_name: node_exporter
+    image: quay.io/prometheus/node-exporter:latest
+    networks:
+    - t2_proxy
+    security_opt:
+    - no-new-privileges:true
+    restart: always
+    command: [
+      "--path.rootfs=/host",
+      "--web.listen-address=:9100",
+    ]
+    #ports:
+        #- 9100:9100
+    volumes:
+        - "/:/host:ro,rslave"
